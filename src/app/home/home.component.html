@@ -2,7 +2,7 @@
   <header class="header">
     <h1>Reserve App</h1>
     <div class="user-info" *ngIf="isAuthenticated()">
-      <span>Bonjour, {{ user()?.name }}</span>
+      <span>Bonjour, {{ user()?.firstName }} {{ user()?.lastName }}</span>
       <button (click)="logout()" class="logout-btn">Déconnexion</button>
     </div>
   </header>
