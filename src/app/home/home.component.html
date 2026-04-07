@@ -1,0 +1,14 @@
+<div class="home-container">
+  <header class="header">
+    <h1>Reserve App</h1>
+    <div class="user-info" *ngIf="isAuthenticated()">
+      <span>Bonjour, {{ user()?.name }}</span>
+      <button (click)="logout()" class="logout-btn">Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <h2>Bienvenue dans votre application de réservation !</h2>
+    <p>Cette page est protégée et nécessite une authentification.</p>
+  </main>
+</div>
