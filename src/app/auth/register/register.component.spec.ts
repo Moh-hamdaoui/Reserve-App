@@ -39,14 +39,16 @@ describe('RegisterComponent', () => {
   it('should call register on valid form submit', () => {
     authServiceSpy.register.mockReturnValue(of(true));
     component.registerForm.setValue({
-      name: 'Test User',
+      firstName: 'Test',
+      lastName: 'User',
       email: 'test@example.com',
       password: 'password123',
       confirmPassword: 'password123'
     });
     component.onSubmit();
     expect(authServiceSpy.register).toHaveBeenCalledWith({
-      name: 'Test User',
+      firstName: 'Test',
+      lastName: 'User',
       email: 'test@example.com',
       password: 'password123'
     });
