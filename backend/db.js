@@ -20,11 +20,36 @@ const testConnection = async () => {
         // On essaie d'obtenir une connexion depuis le pool
         const connection = await pool.getConnection(); 
         console.log('✅ Connecté avec succès à la base de données MySQL !');
-        // Il faut toujours relâcher (libérer) une connexion pour qu'elle puisse être réutilisée par quelqu'un d'autre
         connection.release(); 
     } catch (error) {
-        console.error('❌ Erreur de connexion à la base de données :', error.message);
-        console.log('➜ Indice : Vérifiez que XAMPP est lancé, et que la base de données "' + process.env.DB_NAME + '" existe bien.');
+        // Si la DB n'existe pas, on essaie de la créer
+        if (error.code === 'ER_BAD_DB_ERROR') {
+            try {
+                const tempPool = mysql.createPool({
+                    host: process.env.DB_HOST,
+                    user: process.env.DB_USER,
+                    password: process.env.DB_PASSWORD,
+                    waitForConnections: true,
+                    connectionLimit: 1
+                });
+                
+                const tempConnection = await tempPool.getConnection();
+                await tempConnection.execute(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
+                console.log('✅ Base de données créée avec succès !');
+                tempConnection.release();
+                tempPool.end();
+                
+                // Test final
+                const finalConnection = await pool.getConnection();
+                console.log('✅ Connecté avec succès à la base de données MySQL !');
+                finalConnection.release();
+            } catch (createError) {
+                console.error('❌ Erreur création DB :', createError.message);
+            }
+        } else {
+            console.error('❌ Erreur de connexion à la base de données :', error.message);
+            console.log('➜ Indice : Vérifiez que XAMPP est lancé.');
+        }
     }
 };
 
