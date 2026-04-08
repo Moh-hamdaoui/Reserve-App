@@ -23,7 +23,16 @@ exports.register = async (req, res) => {
             [firstName, lastName, email, hashedPassword]
         );
 
-        res.status(201).json({ message: "Utilisateur cree avec succes.", userId: result.insertId });
+        res.status(201).json({ 
+            message: "Utilisateur cree avec succes.", 
+            accessToken: jwt.sign({ id: result.insertId }, process.env.JWT_SECRET, { expiresIn: '24h' }),
+            user: {
+                id: result.insertId,
+                firstName,
+                lastName,
+                email
+            }
+        });
     } catch (error) {
         console.error("Erreur lors de l'inscription :", error);
         res.status(500).json({ message: "Erreur serveur lors de l'inscription." });
@@ -62,7 +71,7 @@ exports.login = async (req, res) => {
 
         res.status(200).json({
             message: "Connexion reussie.",
-            token,
+            accessToken: token,
             user: {
                 id: user.id,
                 firstName: user.firstName,
