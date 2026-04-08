@@ -18,7 +18,19 @@ const pool = mysql.createPool({
 const testConnection = async () => {
     try {
         // On essaie d'obtenir une connexion depuis le pool
-        const connection = await pool.getConnection(); 
+        const connection = await pool.getConnection();
+        // Toujours créer la table users si elle n'existe pas
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                firstName VARCHAR(50) NOT NULL,
+                lastName VARCHAR(50) NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                role ENUM('user', 'admin') DEFAULT 'user',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
         console.log('✅ Connecté avec succès à la base de données MySQL !');
         connection.release(); 
     } catch (error) {

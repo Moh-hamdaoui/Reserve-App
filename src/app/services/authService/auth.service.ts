@@ -74,7 +74,7 @@ export class AuthService {
   }
 
   login(credentials: AuthCredentials): Observable<boolean> {
-    return this.http.post<AuthResponse>('/api/auth/login', credentials).pipe(
+    return this.http.post<AuthResponse>('http://localhost:3000/api/auth/login', credentials).pipe(
       map(response => {
         this.persistSession(response);
         return true;
@@ -84,7 +84,7 @@ export class AuthService {
   }
 
   register(credentials: RegisterCredentials): Observable<boolean> {
-    return this.http.post<AuthResponse>('/api/auth/register', credentials).pipe(
+    return this.http.post<AuthResponse>('http://localhost:3000/api/auth/register', credentials).pipe(
       map(response => {
         this.persistSession(response);
         return true;
@@ -107,7 +107,7 @@ export class AuthService {
       return of(false);
     }
 
-    return this.http.post<AuthResponse>('/api/auth/refresh', { token: currentToken }).pipe(
+    return this.http.post<AuthResponse>('http://localhost:3000/api/auth/refresh', { token: currentToken }).pipe(
       map(response => {
         this.persistSession(response);
         return true;
