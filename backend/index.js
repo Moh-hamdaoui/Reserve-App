@@ -11,6 +11,8 @@ require('./db');
 
 // Importation des routes
 const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 // Middlewares
 app.use(cors());
@@ -18,6 +20,8 @@ app.use(express.json());
 
 // Configuration globale des routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api', userRoutes);
 
 // Routes basiques
 app.get('/', (req, res) => {

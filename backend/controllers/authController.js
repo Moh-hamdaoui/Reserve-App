@@ -23,7 +23,22 @@ exports.register = async (req, res) => {
             [firstName, lastName, email, hashedPassword]
         );
 
-        res.status(201).json({ message: "Utilisateur cree avec succes.", userId: result.insertId });
+        // Pour le Front-End (Angular), on genere le token tout de suite pour l'auto-login
+        const newUserId = result.insertId;
+        const payload = { id: newUserId, role: 'user' };
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+        res.status(201).json({ 
+            message: "Utilisateur cree avec succes.", 
+            accessToken,
+            user: { 
+                id: newUserId.toString(), 
+                firstName,
+                lastName,
+                email, 
+                role: 'user' 
+            } 
+        });
     } catch (error) {
         console.error("Erreur lors de l'inscription :", error);
         res.status(500).json({ message: "Erreur serveur lors de l'inscription." });
@@ -62,9 +77,9 @@ exports.login = async (req, res) => {
 
         res.status(200).json({
             message: "Connexion reussie.",
-            token,
+            accessToken: token,
             user: {
-                id: user.id,
+                id: user.id.toString(),
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
