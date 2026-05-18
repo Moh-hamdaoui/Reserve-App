@@ -52,7 +52,7 @@ exports.getByDate = async (req, res) => {
 // GET /api/reservations/mine - Réservations de l'utilisateur connecté
 exports.getMine = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = Number(req.user.id);
         const [rows] = await pool.query(
             `SELECT r.id, r.placeId, r.date, r.period, r.created_at,
                     p.name AS placeName, p.floorId,
@@ -95,7 +95,7 @@ exports.getAll = async (req, res) => {
 // POST /api/reservations - Créer une réservation
 exports.create = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = Number(req.user.id);
         const { placeId, date, period = 'full' } = req.body;
 
         if (!placeId || !date) {
@@ -165,7 +165,7 @@ exports.create = async (req, res) => {
 exports.cancel = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        const userId = Number(req.user.id);
         const isAdmin = req.user.role === 'admin';
 
         const [rows] = await pool.query('SELECT userId FROM reservations WHERE id = ?', [id]);
@@ -173,7 +173,7 @@ exports.cancel = async (req, res) => {
             return res.status(404).json({ message: 'Réservation introuvable.' });
         }
 
-        if (!isAdmin && rows[0].userId !== userId) {
+        if (!isAdmin && Number(rows[0].userId) !== userId) {
             return res.status(403).json({ message: 'Vous ne pouvez annuler que vos propres réservations.' });
         }
 

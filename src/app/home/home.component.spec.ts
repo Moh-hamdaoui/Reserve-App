@@ -1,40 +1,61 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
 
 import { HomeComponent } from './home.component';
 import { AuthService } from '../services/authService/auth.service';
+import { FloorService } from '../services/floorService/floor.service';
+import { ReservationService } from '../services/reservationService/reservation.service';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
-  let authServiceSpy: any;
-  let routerSpy: any;
+  let authServiceSpy: { logout: ReturnType<typeof vi.fn> };
+  let routerSpy: { navigate: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
-    const authSpy = {
-      user: signal({ id: '1', email: 'test@example.com', name: 'Test User' }),
-      isAuthenticated: signal(true),
+    authServiceSpy = {
       logout: vi.fn()
     };
-    const routerSpyObj = { navigate: vi.fn() };
+
+    routerSpy = { navigate: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [
-        { provide: AuthService, useValue: authSpy },
-        { provide: Router, useValue: routerSpyObj }
+        {
+          provide: AuthService,
+          useValue: {
+            user: signal({ id: 1, email: 'test@example.com', firstName: 'Test', lastName: 'User' }),
+            isAuthenticated: signal(true),
+            logout: authServiceSpy.logout
+          }
+        },
+        {
+          provide: FloorService,
+          useValue: {
+            getAllFloors: () => of([])
+          }
+        },
+        {
+          provide: ReservationService,
+          useValue: {
+            getByDate: () => of([]),
+            create: vi.fn(),
+            cancel: vi.fn()
+          }
+        },
+        { provide: Router, useValue: routerSpy }
       ]
-    })
-    .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
-    authServiceSpy = TestBed.inject(AuthService);
-    routerSpy = TestBed.inject(Router);
   });
 
   it('should create', () => {
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 

@@ -23,11 +23,13 @@ exports.register = async (req, res) => {
             [firstName, lastName, email, hashedPassword]
         );
 
+        const userId = Number(result.insertId);
+
         res.status(201).json({ 
             message: "Utilisateur cree avec succes.", 
-            accessToken: jwt.sign({ id: result.insertId }, process.env.JWT_SECRET, { expiresIn: '24h' }),
+            accessToken: jwt.sign({ id: userId, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '24h' }),
             user: {
-                id: result.insertId,
+                id: userId,
                 firstName,
                 lastName,
                 email
@@ -60,7 +62,7 @@ exports.login = async (req, res) => {
 
         // Creation du contenu du token (payload)
         const payload = {
-            id: user.id,
+            id: Number(user.id),
             role: user.role
         };
 
@@ -73,7 +75,7 @@ exports.login = async (req, res) => {
             message: "Connexion reussie.",
             accessToken: token,
             user: {
-                id: user.id,
+                id: Number(user.id),
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,

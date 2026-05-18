@@ -19,9 +19,12 @@ exports.verifyToken = (req, res, next) => {
     try {
         // On verifie si le token a bien ete signe avec notre cle secrete et n'est pas expire
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // On sauvegarde les donnees de l'utilisateur (id, role) dans req.user pour pouvoir s'en servir dans les routes
-        req.user = decoded; 
+
+        // Normaliser l'id (JWT peut le fournir en string selon le client)
+        req.user = {
+            ...decoded,
+            id: Number(decoded.id)
+        };
         
         // On dit a Express de passer a l'etape suivante (la route demandee)
         next(); 

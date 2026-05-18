@@ -42,6 +42,50 @@
   padding: 2rem;
 }
 
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.toolbar-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.toolbar-field input,
+.toolbar-field select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #bdc3c7;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.feedback {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+}
+
+.feedback.error {
+  color: #c0392b;
+}
+
+.feedback.loading,
+.feedback.empty {
+  color: #7f8c8d;
+}
+
+.hint {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
 /* Floor tabs */
 .floor-tabs {
   display: flex;
@@ -115,10 +159,24 @@
   border: 2px solid;
   text-align: center;
   transition: transform 0.15s;
+  font: inherit;
+  width: 100%;
 }
 
-.place-card:hover {
+.place-card.clickable:not(:disabled) {
+  cursor: pointer;
+}
+
+.place-card.clickable:not(:disabled):hover {
   transform: translateY(-2px);
+}
+
+.place-card:disabled {
+  cursor: default;
+}
+
+.place-card.own {
+  box-shadow: 0 0 0 2px #3498db;
 }
 
 .place-card.available {
@@ -166,4 +224,12 @@
   font-size: 0.75rem;
   color: #7f8c8d;
   font-style: italic;
+}
+
+.place-action {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #3498db;
+  margin-top: 0.25rem;
 }

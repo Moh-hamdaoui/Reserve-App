@@ -8,37 +8,87 @@
   </header>
 
   <main class="main-content">
-    <div class="floor-tabs">
-      <button
-        *ngFor="let floor of floors"
-        (click)="selectFloor(floor.id)"
-        [class.active]="selectedFloor() === floor.id"
-        class="floor-tab"
-      >
-        {{ floor.name }}
-      </button>
+    <div class="toolbar">
+      <label class="toolbar-field">
+        <span>Date</span>
+        <input
+          type="date"
+          [value]="selectedDate()"
+          (change)="onDateChange($event)"
+          [disabled]="isLoading() || isActionLoading()"
+        />
+      </label>
+      <label class="toolbar-field">
+        <span>Période</span>
+        <select
+          [value]="selectedPeriod()"
+          (change)="onPeriodChange($event)"
+          [disabled]="isLoading() || isActionLoading()"
+        >
+          <option *ngFor="let option of periodOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
     </div>
 
-    <div class="stats-bar">
-      <span class="stat available">{{ availableCount }} disponible(s)</span>
-      <span class="stat reserved">{{ reservedCount }} réservée(s)</span>
-      <span class="stat inactive">{{ inactiveCount }} inactive(s)</span>
-    </div>
+    <p class="feedback error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+    <p class="feedback loading" *ngIf="isLoading()">Chargement…</p>
 
-    <div class="places-grid" *ngIf="currentFloor">
-      <div
-        *ngFor="let place of currentFloor.places"
-        class="place-card"
-        [class.available]="place.active && !place.reserved"
-        [class.reserved]="place.reserved"
-        [class.inactive]="!place.active"
-      >
-        <span class="place-name">{{ place.name }}</span>
-        <span class="place-status" *ngIf="!place.active">Inactive</span>
-        <span class="place-status" *ngIf="place.active && !place.reserved">Disponible</span>
-        <span class="place-status" *ngIf="place.reserved">Réservée</span>
-        <span class="place-reserved-by" *ngIf="place.reservedBy">{{ place.reservedBy }}</span>
-      </div>
-    </div>
+    <ng-container *ngIf="!isLoading()">
+      <p class="feedback empty" *ngIf="floors().length === 0">
+        Aucun étage configuré. Ajoutez des étages et des places via l’administration.
+      </p>
+
+      <ng-container *ngIf="floors().length > 0">
+        <div class="floor-tabs">
+          <button
+            *ngFor="let floor of floors()"
+            (click)="selectFloor(floor.id)"
+            [class.active]="selectedFloor() === floor.id"
+            class="floor-tab"
+          >
+            {{ floor.name }}
+          </button>
+        </div>
+
+        <div class="stats-bar">
+          <span class="stat available">{{ availableCount() }} disponible(s)</span>
+          <span class="stat reserved">{{ reservedCount() }} réservée(s)</span>
+          <span class="stat inactive">{{ inactiveCount() }} inactive(s)</span>
+        </div>
+
+        <p class="hint" *ngIf="!isActionLoading()">
+          Créneau affiché : <strong>{{ selectedPeriodLabel() }}</strong> —
+          cliquez sur une place disponible pour réserver, ou sur la vôtre pour annuler.
+        </p>
+
+        <div class="places-grid" *ngIf="currentFloor() as floor">
+          <button
+            type="button"
+            *ngFor="let place of floor.places"
+            class="place-card"
+            [class.available]="place.active && !place.reserved"
+            [class.reserved]="place.reserved"
+            [class.inactive]="!place.active"
+            [class.own]="place.isOwnReservation"
+            [class.clickable]="place.active && (!place.reserved || place.isOwnReservation)"
+            [disabled]="!place.active || isActionLoading() || (place.reserved && !place.isOwnReservation)"
+            (click)="onPlaceClick(place)"
+          >
+            <span class="place-name">{{ place.name }}</span>
+            <span class="place-status" *ngIf="!place.active">Inactive</span>
+            <span class="place-status" *ngIf="place.active && !place.reserved">Disponible</span>
+            <span class="place-status" *ngIf="place.reserved">Réservée</span>
+            <span class="place-reserved-by" *ngIf="place.reservedBy">
+              {{ place.reservedBy }}
+              <ng-container *ngIf="place.reservedPeriod">({{ periodLabel(place.reservedPeriod) }})</ng-container>
+            </span>
+            <span class="place-action" *ngIf="place.active && !place.reserved">Réserver</span>
+            <span class="place-action" *ngIf="place.isOwnReservation">Annuler</span>
+          </button>
+        </div>
+      </ng-container>
+    </ng-container>
   </main>
 </div>
