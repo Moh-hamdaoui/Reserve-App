@@ -14,23 +14,61 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+// Création de toutes les tables
+const createTables = async (connection) => {
+    await connection.execute(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            firstName VARCHAR(50) NOT NULL,
+            lastName VARCHAR(50) NOT NULL,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            role ENUM('user', 'admin') DEFAULT 'user',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    await connection.execute(`
+        CREATE TABLE IF NOT EXISTS floors (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(50),
+            placesNumber INT NOT NULL DEFAULT 0
+        )
+    `);
+
+    await connection.execute(`
+        CREATE TABLE IF NOT EXISTS places (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(50),
+            active BOOLEAN DEFAULT TRUE,
+            floorId INT NOT NULL,
+            positionX INT NOT NULL DEFAULT 0,
+            positionY INT NOT NULL DEFAULT 0,
+            FOREIGN KEY (floorId) REFERENCES floors(id) ON DELETE CASCADE
+        )
+    `);
+
+    await connection.execute(`
+        CREATE TABLE IF NOT EXISTS reservations (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            userId INT NOT NULL,
+            placeId INT NOT NULL,
+            date DATE NOT NULL,
+            period ENUM('full', 'morning', 'afternoon') DEFAULT 'full',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (placeId) REFERENCES places(id) ON DELETE CASCADE,
+            UNIQUE KEY unique_reservation (placeId, date, period)
+        )
+    `);
+};
+
 // Fonction pour tester si la connexion fonctionne au démarrage du serveur
 const testConnection = async () => {
     try {
         // On essaie d'obtenir une connexion depuis le pool
         const connection = await pool.getConnection();
-        // Toujours créer la table users si elle n'existe pas
-        await connection.execute(`
-            CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                firstName VARCHAR(50) NOT NULL,
-                lastName VARCHAR(50) NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                role ENUM('user', 'admin') DEFAULT 'user',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
+        await createTables(connection);
         console.log('✅ Connecté avec succès à la base de données MySQL !');
         connection.release(); 
     } catch (error) {
@@ -53,18 +91,8 @@ const testConnection = async () => {
                 
                 // Test final + create tables
                 const finalConnection = await pool.getConnection();
-                await finalConnection.execute(`
-                    CREATE TABLE IF NOT EXISTS users (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        firstName VARCHAR(50) NOT NULL,
-                        lastName VARCHAR(50) NOT NULL,
-                        email VARCHAR(100) UNIQUE NOT NULL,
-                        password VARCHAR(255) NOT NULL,
-                        role ENUM('user', 'admin') DEFAULT 'user',
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                `);
-                console.log('✅ Table users créée !');
+                await createTables(finalConnection);
+                console.log('✅ Tables créées !');
                 console.log('✅ Connecté avec succès à la base de données MySQL !');
                 finalConnection.release();
             } catch (createError) {

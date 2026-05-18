@@ -40,15 +40,130 @@
 .main-content {
   flex: 1;
   padding: 2rem;
-  text-align: center;
 }
 
-.main-content h2 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
+/* Floor tabs */
+.floor-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.main-content p {
+.floor-tab {
+  padding: 0.6rem 1.5rem;
+  border: 2px solid #3498db;
+  background: white;
+  color: #3498db;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.floor-tab:hover {
+  background: #ebf5fb;
+}
+
+.floor-tab.active {
+  background: #3498db;
+  color: white;
+}
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.stat.available {
+  background: #d5f5e3;
+  color: #1e8449;
+}
+
+.stat.reserved {
+  background: #fadbd8;
+  color: #c0392b;
+}
+
+.stat.inactive {
+  background: #eaecee;
   color: #7f8c8d;
-  font-size: 1.1rem;
+}
+
+/* Places grid */
+.places-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.place-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1.2rem 1rem;
+  border-radius: 8px;
+  border: 2px solid;
+  text-align: center;
+  transition: transform 0.15s;
+}
+
+.place-card:hover {
+  transform: translateY(-2px);
+}
+
+.place-card.available {
+  border-color: #27ae60;
+  background: #eafaf1;
+}
+
+.place-card.reserved {
+  border-color: #e74c3c;
+  background: #fdedec;
+}
+
+.place-card.inactive {
+  border-color: #bdc3c7;
+  background: #f4f6f6;
+  opacity: 0.6;
+}
+
+.place-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.place-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.place-card.available .place-status {
+  color: #27ae60;
+}
+
+.place-card.reserved .place-status {
+  color: #e74c3c;
+}
+
+.place-card.inactive .place-status {
+  color: #95a5a6;
+}
+
+.place-reserved-by {
+  font-size: 0.75rem;
+  color: #7f8c8d;
+  font-style: italic;
 }

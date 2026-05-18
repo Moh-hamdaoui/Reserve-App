@@ -8,7 +8,37 @@
   </header>
 
   <main class="main-content">
-    <h2>Bienvenue dans votre application de réservation !</h2>
-    <p>Cette page est protégée et nécessite une authentification.</p>
+    <div class="floor-tabs">
+      <button
+        *ngFor="let floor of floors"
+        (click)="selectFloor(floor.id)"
+        [class.active]="selectedFloor() === floor.id"
+        class="floor-tab"
+      >
+        {{ floor.name }}
+      </button>
+    </div>
+
+    <div class="stats-bar">
+      <span class="stat available">{{ availableCount }} disponible(s)</span>
+      <span class="stat reserved">{{ reservedCount }} réservée(s)</span>
+      <span class="stat inactive">{{ inactiveCount }} inactive(s)</span>
+    </div>
+
+    <div class="places-grid" *ngIf="currentFloor">
+      <div
+        *ngFor="let place of currentFloor.places"
+        class="place-card"
+        [class.available]="place.active && !place.reserved"
+        [class.reserved]="place.reserved"
+        [class.inactive]="!place.active"
+      >
+        <span class="place-name">{{ place.name }}</span>
+        <span class="place-status" *ngIf="!place.active">Inactive</span>
+        <span class="place-status" *ngIf="place.active && !place.reserved">Disponible</span>
+        <span class="place-status" *ngIf="place.reserved">Réservée</span>
+        <span class="place-reserved-by" *ngIf="place.reservedBy">{{ place.reservedBy }}</span>
+      </div>
+    </div>
   </main>
 </div>
