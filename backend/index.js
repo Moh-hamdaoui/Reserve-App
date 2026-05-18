@@ -11,6 +11,9 @@ require('./db');
 
 // Importation des routes
 const authRoutes = require('./routes/authRoutes');
+const floorRoutes = require('./routes/floorRoutes');
+const placeRoutes = require('./routes/placeRoutes');
+const reservationRoutes = require('./routes/reservationRoutes');
 
 // Middlewares
 app.use(cors());
@@ -18,6 +21,9 @@ app.use(express.json());
 
 // Configuration globale des routes
 app.use('/api/auth', authRoutes);
+app.use('/api/floors', floorRoutes);
+app.use('/api/places', placeRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 // Routes basiques
 app.get('/', (req, res) => {
