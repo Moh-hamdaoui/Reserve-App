@@ -17,25 +17,25 @@ INSERT INTO floors (name, placesNumber) VALUES
   ('Étage 1', 8),
   ('Étage 2', 6);
 
--- Places — Étage 1
+-- Places — Étage 1 : salles de part et d’autre d’un couloir (positionX/Y en base 0)
 INSERT INTO places (name, active, floorId, positionX, positionY) VALUES
-  ('A-1', 1, 1, 0, 0),
-  ('A-2', 1, 1, 1, 0),
-  ('A-3', 1, 1, 2, 0),
-  ('A-4', 0, 1, 3, 0),
-  ('A-5', 1, 1, 0, 1),
-  ('A-6', 1, 1, 1, 1),
-  ('A-7', 1, 1, 2, 1),
-  ('A-8', 1, 1, 3, 1);
+  ('Salle 101', 1, 1, 1, 0),
+  ('Salle 102', 1, 1, 2, 0),
+  ('Salle 103', 1, 1, 4, 0),
+  ('Salle 104', 0, 1, 5, 0),
+  ('Salle 105', 1, 1, 1, 2),
+  ('Salle 106', 1, 1, 2, 2),
+  ('Salle 107', 1, 1, 4, 2),
+  ('Salle 108', 1, 1, 5, 2);
 
--- Places — Étage 2
+-- Places — Étage 2 : disposition en U autour du palier / escalier
 INSERT INTO places (name, active, floorId, positionX, positionY) VALUES
-  ('B-1', 1, 2, 0, 0),
-  ('B-2', 1, 2, 1, 0),
-  ('B-3', 1, 2, 2, 0),
-  ('B-4', 1, 2, 3, 0),
-  ('B-5', 0, 2, 0, 1),
-  ('B-6', 1, 2, 1, 1);
+  ('Salle 201', 1, 2, 0, 0),
+  ('Salle 202', 1, 2, 1, 0),
+  ('Salle 203', 1, 2, 2, 0),
+  ('Salle 204', 1, 2, 1, 2),
+  ('Salle 205', 0, 2, 0, 2),
+  ('Salle 206', 1, 2, 2, 2);
 
 -- Compteur de places par étage
 UPDATE floors SET placesNumber = (SELECT COUNT(*) FROM places WHERE floorId = floors.id);
@@ -53,29 +53,29 @@ INSERT IGNORE INTO users (firstName, lastName, email, password, role) VALUES
 INSERT INTO reservations (userId, placeId, date, period)
 SELECT u.id, p.id, CURDATE(), 'morning'
 FROM users u
-JOIN places p ON p.name = 'A-2'
+JOIN places p ON p.name = 'Salle 102'
 WHERE u.email = 'marie@demo.com';
 
 INSERT INTO reservations (userId, placeId, date, period)
 SELECT u.id, p.id, CURDATE(), 'afternoon'
 FROM users u
-JOIN places p ON p.name = 'A-5'
+JOIN places p ON p.name = 'Salle 105'
 WHERE u.email = 'jean@demo.com';
 
 INSERT INTO reservations (userId, placeId, date, period)
 SELECT u.id, p.id, CURDATE(), 'full'
 FROM users u
-JOIN places p ON p.name = 'A-8'
+JOIN places p ON p.name = 'Salle 108'
 WHERE u.email = 'sophie@demo.com';
 
 INSERT INTO reservations (userId, placeId, date, period)
 SELECT u.id, p.id, CURDATE(), 'morning'
 FROM users u
-JOIN places p ON p.name = 'B-1'
+JOIN places p ON p.name = 'Salle 201'
 WHERE u.email = 'paul@demo.com';
 
 INSERT INTO reservations (userId, placeId, date, period)
 SELECT u.id, p.id, CURDATE(), 'afternoon'
 FROM users u
-JOIN places p ON p.name = 'B-4'
+JOIN places p ON p.name = 'Salle 204'
 WHERE u.email = 'claire@demo.com';

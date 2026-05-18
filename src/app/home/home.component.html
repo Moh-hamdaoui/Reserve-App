@@ -63,30 +63,53 @@
           cliquez sur une place disponible pour réserver, ou sur la vôtre pour annuler.
         </p>
 
-        <div class="places-grid" *ngIf="currentFloor() as floor">
-          <button
-            type="button"
-            *ngFor="let place of floor.places"
-            class="place-card"
-            [class.available]="place.active && !place.reserved"
-            [class.reserved]="place.reserved"
-            [class.inactive]="!place.active"
-            [class.own]="place.isOwnReservation"
-            [class.clickable]="place.active && (!place.reserved || place.isOwnReservation)"
-            [disabled]="!place.active || isActionLoading() || (place.reserved && !place.isOwnReservation)"
-            (click)="onPlaceClick(place)"
+        <div class="floor-plan-wrapper" *ngIf="currentFloor() as floor">
+          <p class="floor-plan-legend">
+            Plan — {{ floor.name }}
+            <span class="floor-plan-legend__north">↑ Entrée / nord</span>
+          </p>
+
+          <div
+            class="floor-plan"
+            *ngIf="currentFloorPlan() as plan"
+            [style.grid-template-columns]="'repeat(' + plan.cols + ', minmax(100px, 1fr))'"
+            [style.grid-template-rows]="'repeat(' + plan.rows + ', minmax(88px, auto))'"
           >
-            <span class="place-name">{{ place.name }}</span>
-            <span class="place-status" *ngIf="!place.active">Inactive</span>
-            <span class="place-status" *ngIf="place.active && !place.reserved">Disponible</span>
-            <span class="place-status" *ngIf="place.reserved">Réservée</span>
-            <span class="place-reserved-by" *ngIf="place.reservedBy">
-              {{ place.reservedBy }}
-              <ng-container *ngIf="place.reservedPeriod">({{ periodLabel(place.reservedPeriod) }})</ng-container>
-            </span>
-            <span class="place-action" *ngIf="place.active && !place.reserved">Réserver</span>
-            <span class="place-action" *ngIf="place.isOwnReservation">Annuler</span>
-          </button>
+            <div
+              *ngFor="let corridor of plan.corridors"
+              class="floor-corridor"
+              [style.grid-column]="corridor.col + ' / span ' + (corridor.colSpan ?? 1)"
+              [style.grid-row]="corridor.row + ' / span ' + (corridor.rowSpan ?? 1)"
+            >
+              {{ corridor.label }}
+            </div>
+
+            <button
+              type="button"
+              *ngFor="let place of floor.places"
+              class="place-card"
+              [class.available]="place.active && !place.reserved"
+              [class.reserved]="place.reserved"
+              [class.inactive]="!place.active"
+              [class.own]="place.isOwnReservation"
+              [class.clickable]="place.active && (!place.reserved || place.isOwnReservation)"
+              [style.grid-column]="place.positionX + 1"
+              [style.grid-row]="place.positionY + 1"
+              [disabled]="!place.active || isActionLoading() || (place.reserved && !place.isOwnReservation)"
+              (click)="onPlaceClick(place)"
+            >
+              <span class="place-name">{{ place.name }}</span>
+              <span class="place-status" *ngIf="!place.active">Inactive</span>
+              <span class="place-status" *ngIf="place.active && !place.reserved">Disponible</span>
+              <span class="place-status" *ngIf="place.reserved">Réservée</span>
+              <span class="place-reserved-by" *ngIf="place.reservedBy">
+                {{ place.reservedBy }}
+                <ng-container *ngIf="place.reservedPeriod">({{ periodLabel(place.reservedPeriod) }})</ng-container>
+              </span>
+              <span class="place-action" *ngIf="place.active && !place.reserved">Réserver</span>
+              <span class="place-action" *ngIf="place.isOwnReservation">Annuler</span>
+            </button>
+          </div>
         </div>
       </ng-container>
     </ng-container>

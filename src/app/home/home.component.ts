@@ -10,11 +10,41 @@ import {
   ReservationService
 } from '../services/reservationService/reservation.service';
 
+interface CorridorCell {
+  col: number;
+  row: number;
+  colSpan?: number;
+  rowSpan?: number;
+  label?: string;
+}
+
+interface FloorPlanLayout {
+  cols: number;
+  rows: number;
+  corridors: CorridorCell[];
+}
+
+/** Disposition type « plan d’école » par identifiant d’étage (1 = rez, 2 = 1er, etc.) */
+const FLOOR_PLAN_LAYOUTS: Record<number, FloorPlanLayout> = {
+  1: {
+    cols: 6,
+    rows: 3,
+    corridors: [{ col: 1, row: 2, colSpan: 5, rowSpan: 1, label: 'Couloir principal' }]
+  },
+  2: {
+    cols: 3,
+    rows: 3,
+    corridors: [{ col: 2, row: 2, colSpan: 1, rowSpan: 1, label: 'Palier / escalier' }]
+  }
+};
+
 interface PlaceView {
   id: number;
   name: string;
   active: boolean;
   floorId: number;
+  positionX: number;
+  positionY: number;
   reserved: boolean;
   reservedBy?: string;
   reservedPeriod?: ReservationPeriod;
@@ -56,6 +86,14 @@ export class HomeComponent implements OnInit {
   readonly currentFloor = computed(() =>
     this.floors().find(f => f.id === this.selectedFloor()) ?? null
   );
+
+  readonly currentFloorPlan = computed(() => {
+    const floor = this.currentFloor();
+    if (!floor) {
+      return null;
+    }
+    return this.resolveFloorPlan(floor);
+  });
 
   readonly availableCount = computed(
     () => this.currentFloor()?.places.filter(p => p.active && !p.reserved).length ?? 0
@@ -164,8 +202,25 @@ export class HomeComponent implements OnInit {
     }));
   }
 
+  resolveFloorPlan(floor: FloorView): FloorPlanLayout {
+    const preset = FLOOR_PLAN_LAYOUTS[floor.id];
+    if (preset) {
+      return preset;
+    }
+    const cols = Math.max(1, ...floor.places.map(p => p.positionX + 1));
+    const rows = Math.max(1, ...floor.places.map(p => p.positionY + 1));
+    return { cols, rows, corridors: [] };
+  }
+
   private mapPlace(
-    place: { id: number; name: string; active: boolean; floorId: number },
+    place: {
+      id: number;
+      name: string;
+      active: boolean;
+      floorId: number;
+      positionX: number;
+      positionY: number;
+    },
     floorId: number
   ): PlaceView {
     const reservation = this.getBlockingReservation(place.id, this.selectedPeriod());
@@ -176,6 +231,8 @@ export class HomeComponent implements OnInit {
       name: place.name,
       active: place.active,
       floorId,
+      positionX: place.positionX,
+      positionY: place.positionY,
       reserved: !!reservation,
       reservedBy: reservation
         ? `${reservation.firstName} ${reservation.lastName}`
